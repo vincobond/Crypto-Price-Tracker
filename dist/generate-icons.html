@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PWA Icon Generator</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #111827; color: white; }
+        .icon-preview { display: inline-block; margin: 10px; text-align: center; }
+        canvas { border: 1px solid #374151; margin: 5px; }
+        button { background: #0EA5E9; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 5px; }
+        button:hover { background: #0284C7; }
+    </style>
+</head>
+<body>
+    <h1>Crypto Tracker PWA Icon Generator</h1>
+    <p>This will generate all required icon sizes for the PWA.</p>
+    
+    <div id="icons"></div>
+    
+    <button onclick="generateAllIcons()">Generate All Icons</button>
+    <button onclick="downloadAll()">Download All Icons</button>
+
+    <script>
+        const sizes = [72, 96, 128, 144, 152, 192, 384, 512];
+        const icons = {};
+
+        function createIcon(size) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            
+            // Background circle
+            const center = size / 2;
+            const radius = size * 0.4;
+            
+            // Outer circle
+            ctx.fillStyle = '#111827';
+            ctx.beginPath();
+            ctx.arc(center, center, radius, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Border
+            ctx.strokeStyle = '#0EA5E9';
+            ctx.lineWidth = size * 0.02;
+            ctx.stroke();
+            
+            // Inner circle
+            ctx.fillStyle = '#1F2937';
+            ctx.beginPath();
+            ctx.arc(center, center, radius * 0.8, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Bitcoin symbol
+            ctx.fillStyle = '#0EA5E9';
+            ctx.font = `bold ${size * 0.3}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('₿', center, center + size * 0.05);
+            
+            // AI brain icon (small)
+            const brainSize = size * 0.15;
+            const brainX = center - size * 0.2;
+            const brainY = center - size * 0.2;
+            
+            ctx.fillStyle = '#22D3EE';
+            ctx.beginPath();
+            ctx.arc(brainX, brainY, brainSize, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Brain details
+            ctx.fillStyle = '#111827';
+            ctx.beginPath();
+            ctx.arc(brainX - brainSize * 0.3, brainY - brainSize * 0.3, brainSize * 0.2, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(brainX + brainSize * 0.3, brainY - brainSize * 0.3, brainSize * 0.2, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Chart line
+            ctx.strokeStyle = '#10B981';
+            ctx.lineWidth = size * 0.01;
+            ctx.beginPath();
+            ctx.moveTo(center + size * 0.15, center - size * 0.1);
+            ctx.lineTo(center + size * 0.25, center - size * 0.2);
+            ctx.lineTo(center + size * 0.35, center - size * 0.15);
+            ctx.stroke();
+            
+            return canvas;
+        }
+
+        function generateAllIcons() {
+            const container = document.getElementById('icons');
+            container.innerHTML = '';
+            
+            sizes.forEach(size => {
+                const canvas = createIcon(size);
+                icons[size] = canvas;
+                
+                const preview = document.createElement('div');
+                preview.className = 'icon-preview';
+                preview.innerHTML = `
+                    <div>${size}x${size}</div>
+                    <canvas width="${size}" height="${size}"></canvas>
+                    <br>
+                    <button onclick="downloadIcon(${size})">Download</button>
+                `;
+                
+                const previewCanvas = preview.querySelector('canvas');
+                const previewCtx = previewCanvas.getContext('2d');
+                previewCtx.drawImage(canvas, 0, 0);
+                
+                container.appendChild(preview);
+            });
+        }
+
+        function downloadIcon(size) {
+            const canvas = icons[size];
+            const link = document.createElement('a');
+            link.download = `icon-${size}x${size}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+
+        function downloadAll() {
+            sizes.forEach(size => {
+                setTimeout(() => downloadIcon(size), size * 10);
+            });
+        }
+
+        // Auto-generate on load
+        window.onload = generateAllIcons;
+    </script>
+</body>
+</html>
